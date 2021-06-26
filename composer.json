@@ -11,7 +11,8 @@
     ],
     "require": {
         "php": "7.3 - 7.4",
-        "alcamo/core": "dev-master"
+        "alcamo/core": "dev-master",
+        "ulrichsg/getopt-php": "^3.4"
     },
     "autoload": {
 	"psr-4": {
