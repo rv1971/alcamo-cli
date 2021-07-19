@@ -1,32 +1,56 @@
 <?php
 
+/**
+ * @namespace alcamo\cli
+ *
+ * @brief Simplify creation of command-line interfaces
+ *
+ * @todo Write unit tests
+ */
 namespace alcamo\cli;
 
 use GetOpt\{Command, GetOpt as GetOptBase, Operand, Option};
 
+/**
+ * @brief GetOpt extension coding the whole structure in class constants
+ *
+ * @date Last reviewed 2021-07-19
+ */
 class GetOpt extends GetOptBase
 {
+    /// Input for createOptionsFromIterable()
     public const OPTIONS = [
-        'help' =>    [ 'h',  GetOpt::NO_ARGUMENT, 'Show help' ],
+        'help' =>    [ 'h', GetOpt::NO_ARGUMENT, 'Show help' ],
         'quiet' =>   [ 'q', GetOpt::NO_ARGUMENT, 'Be less verbose' ],
         'verbose' => [ 'v', GetOpt::NO_ARGUMENT, 'Be more verbose' ]
     ];
 
+    /// Input for createOperandsFromIterable()
     public const OPERANDS = [];
 
+    /// Input for createCommandsFromIterable()
     public const COMMANDS = [];
 
+    ///
     public function __construct($options = null, array $settings = [])
     {
         parent::__construct($options, $settings);
 
-        $this->addOptions($this->createOptionsFromIterable(static::OPTIONS));
-
-        $this->addOperands($this->createOperandsFromIterable(static::OPERANDS));
-
-        $this->addCommands($this->createCommandsFromIterable(static::COMMANDS));
+        $this
+            ->addOptions($this->createOptionsFromIterable(static::OPTIONS))
+            ->addOperands($this->createOperandsFromIterable(static::OPERANDS))
+            ->addCommands($this->createCommandsFromIterable(static::COMMANDS));
     }
 
+    /**
+     * @brief Create array of GetOpt::Option from iterable
+     *
+     * @param $optionData Map of long option names to numerically-indexed
+     * arrays consisting of
+     * - short name (potentially `null`)
+     * - mode
+     * - description
+     */
     public function createOptionsFromIterable(iterable $optionData): array
     {
         $options = [];
@@ -39,6 +63,11 @@ class GetOpt extends GetOptBase
         return $options;
     }
 
+    /**
+     * @brief Create array of GetOpt::Operand from iterable
+     *
+     * @param $optionData Map of operand names to modes.
+     */
     public function createOperandsFromIterable(iterable $operandData): array
     {
         $operands = [];
@@ -50,18 +79,29 @@ class GetOpt extends GetOptBase
         return $operands;
     }
 
+    /**
+     * @brief Create array of GetOpt::Command from iterable
+     *
+     * @param $optionData Map of command names to numerically-indexed
+     * arrays consisting of
+     * - handler
+     * - options as input to createOptionsFromIterable()
+     * - operands as input to createOperandsFromIterable()
+     * - description
+     */
     public function createCommandsFromIterable(iterable $commandData): array
     {
         $commands = [];
 
         foreach ($commandData as $name => $d) {
-            $commands[] = (
-                new Command(
-                    $name,
-                    $d[0],
-                    $this->createOptionsFromIterable($d[1])
+            $commands[] =
+                (
+                    new Command(
+                        $name,
+                        $d[0],
+                        $this->createOptionsFromIterable($d[1])
+                    )
                 )
-            )
                 ->addOperands($this->createOperandsFromIterable($d[2]))
                 ->setShortDescription($d[3]);
         }
