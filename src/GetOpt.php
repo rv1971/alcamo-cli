@@ -7,6 +7,7 @@
  *
  * @todo Write unit tests
  */
+
 namespace alcamo\cli;
 
 use GetOpt\{Command, GetOpt as GetOptBase, Operand, Option};
