@@ -14,7 +14,7 @@ class AbstractCliTest extends TestCase
     {
         $cli = new MyCli();
 
-        /* There is no simply way to test stderr output, so what is teste here
+        /* There is no simply way to test stderr output, so what is tested here
          * is just the verbosity level check. */
         $this->assertFalse($cli->reportProgress('VERBOSITY 1', 1));
     }

@@ -61,7 +61,9 @@ abstract class AbstractCli extends GetOpt
         ?int $minimumVerbosity = null
     ): bool {
         if ($this->getVerbosity() >= (int)$minimumVerbosity) {
-            fwrite(STDERR, "$text\n");
+            /* fwrite(STDERR, ...) may not work in php installations that are
+             * not meant for command-line usage, e.g. on hosted webspace */
+            file_put_contents('php://stderr', "$text\n");
             return true;
         }
 
