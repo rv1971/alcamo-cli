@@ -21,9 +21,9 @@ class GetOpt extends GetOptBase
 {
     /// Input for createOptionsFromIterable()
     public const OPTIONS = [
-        'help' =>    [ 'h', GetOpt::NO_ARGUMENT, 'Show help' ],
-        'quiet' =>   [ 'q', GetOpt::NO_ARGUMENT, 'Be less verbose' ],
-        'verbose' => [ 'v', GetOpt::NO_ARGUMENT, 'Be more verbose' ]
+        'help' =>    [ 'h', self::NO_ARGUMENT, 'Show help' ],
+        'quiet' =>   [ 'q', self::NO_ARGUMENT, 'Be less verbose' ],
+        'verbose' => [ 'v', self::NO_ARGUMENT, 'Be more verbose' ]
     ];
 
     /// Input for createOperandsFromIterable()
@@ -32,10 +32,12 @@ class GetOpt extends GetOptBase
     /// Input for createCommandsFromIterable()
     public const COMMANDS = [];
 
-    ///
+    /// Defaults for the $setting given to __construct
+    public const SETTINGS = [];
+
     public function __construct($options = null, array $settings = [])
     {
-        parent::__construct($options, $settings);
+        parent::__construct($options, $settings + static::SETTINGS);
 
         $this
             ->addOptions($this->createOptionsFromIterable(static::OPTIONS))
