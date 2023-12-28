@@ -53,6 +53,7 @@ class GetOpt extends GetOptBase
      * - short name (potentially `null`)
      * - mode
      * - description
+     * - optionally argument name
      * - optionally validation callback
      */
     public function createOptionsFromIterable(iterable $optionData): array
@@ -63,7 +64,11 @@ class GetOpt extends GetOptBase
             $option = (new Option($d[0], $long, $d[1]))->setDescription($d[2]);
 
             if (isset($d[3])) {
-                $option->setValidation($d[3]);
+                $option->setArgumentName($d[3]);
+            }
+
+            if (isset($d[4])) {
+                $option->setValidation($d[4]);
             }
 
             $options[] = $option;
