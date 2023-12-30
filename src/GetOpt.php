@@ -57,6 +57,10 @@ class GetOpt extends GetOptBase
      * - description
      * - optionally argument name
      * - optionally validation callback
+     *
+     * Options are sorted case-insensitively as follows: first options with a
+     * short version, sorted by short version, then all other options, sorted
+     * by long version.
      */
     public function createOptionsFromIterable(iterable $optionData): array
     {
@@ -73,8 +77,10 @@ class GetOpt extends GetOptBase
                 $option->setValidation($d[4]);
             }
 
-            $options[] = $option;
+            $options[strtolower(($d[0] ?? '~') . $long)] = $option;
         }
+
+        ksort($options);
 
         return $options;
     }

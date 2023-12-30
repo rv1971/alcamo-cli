@@ -24,7 +24,7 @@ abstract class AbstractCli extends GetOpt
      *
      * Call showHelp() if the `help` option was given.
      */
-    public function process($arguments = null)
+    public function process($arguments = null): int
     {
         try {
             parent::process($arguments);
@@ -36,12 +36,12 @@ abstract class AbstractCli extends GetOpt
                 echo $e->getMessage();
             }
 
-            exit;
+            return 255;
         }
 
         if ($this->getOption('help')) {
             $this->showHelp();
-            exit;
+            return 0;
         }
     }
 
