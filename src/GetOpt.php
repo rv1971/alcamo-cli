@@ -33,7 +33,9 @@ class GetOpt extends GetOptBase
     public const COMMANDS = [];
 
     /// Defaults for the $setting given to __construct
-    public const SETTINGS = [];
+    public const SETTINGS = [
+        self::SETTING_STRICT_OPERANDS => true
+    ];
 
     public function __construct($options = null, array $settings = [])
     {
