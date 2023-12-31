@@ -28,11 +28,13 @@ class MyCli extends AbstractCli
 
     public function innerRun(): int
     {
-        throw (new Unsupported())->setMessageContext(
-            [ 'feature' => $this->getOption('bar') ]
-        );
+        if ($this->getOption('bar')) {
+            throw (new Unsupported())->setMessageContext(
+                [ 'feature' => $this->getOption('bar') ]
+            );
+        }
 
-        return 0;
+        return 42;
     }
 }
 
@@ -72,6 +74,13 @@ EOT
     }
 
     public function testRun(): void
+    {
+        $cli = new MyCli();
+
+        $this->assertSame(42, $cli->run(''));
+    }
+
+    public function testRunException(): void
     {
         $cli = new MyCli();
 
