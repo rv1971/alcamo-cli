@@ -47,10 +47,10 @@ class AbstractCliTest extends TestCase
 
 Options:
   -F, --foo <foo>  Lorem ipsum.
-  -h, --help       Show help
-  -q, --quiet      Be less verbose
+  -h, --help       Show help.
+  -q, --quiet      Be less verbose.
   -r, --bar <arg>  Dolor sit amet.
-  -v, --verbose    Be more verbose
+  -v, --verbose    Be more verbose.
   --baz            Consetetur sadipscing.
 
 

@@ -21,9 +21,9 @@ class GetOpt extends GetOptBase
 {
     /// Input for createOptionsFromIterable()
     public const OPTIONS = [
-        'help' =>    [ 'h', self::NO_ARGUMENT, 'Show help' ],
-        'quiet' =>   [ 'q', self::NO_ARGUMENT, 'Be less verbose' ],
-        'verbose' => [ 'v', self::NO_ARGUMENT, 'Be more verbose' ]
+        'help' =>    [ 'h', self::NO_ARGUMENT, 'Show help.' ],
+        'quiet' =>   [ 'q', self::NO_ARGUMENT, 'Be less verbose.' ],
+        'verbose' => [ 'v', self::NO_ARGUMENT, 'Be more verbose.' ]
     ];
 
     /// Input for createOperandsFromIterable()
