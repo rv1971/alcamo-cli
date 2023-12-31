@@ -2,6 +2,7 @@
 
 namespace alcamo\cli;
 
+use alcamo\exception\Unsupported;
 use PHPUnit\Framework\TestCase;
 
 class MyCli extends AbstractCli
@@ -24,6 +25,15 @@ class MyCli extends AbstractCli
             'Consetetur sadipscing.'
         ]
     ] + parent::OPTIONS;
+
+    public function innerRun(): int
+    {
+        throw (new Unsupported())->setMessageContext(
+            [ 'feature' => $this->getOption('bar') ]
+        );
+
+        return 0;
+    }
 }
 
 class AbstractCliTest extends TestCase
@@ -33,7 +43,7 @@ class AbstractCliTest extends TestCase
         $cli = new MyCli();
 
         $this->expectOutputString(
-"Usage: {$_SERVER['argv'][0]} [options] \n" . <<<EOT
+            "Usage: {$_SERVER['argv'][0]} [options] \n" . <<<EOT
 
 Options:
   -F, --foo <foo>  Lorem ipsum.
@@ -45,9 +55,9 @@ Options:
 
 
 EOT
-);
+        );
 
-        $exitCode = $cli->process('--help');
+        $exitCode = $cli->run('--help');
 
         $this->assertSame(0, $exitCode);
     }
@@ -59,5 +69,16 @@ EOT
         /* There is no simply way to test stderr output, so what is tested here
          * is just the verbosity level check. */
         $this->assertFalse($cli->reportProgress('VERBOSITY 1', 1));
+    }
+
+    public function testRun(): void
+    {
+        $cli = new MyCli();
+
+        $feature = 'foo';
+
+        $this->expectOutputString("\"$feature\" not supported\n\n");
+
+        $cli->run("--bar $feature");
     }
 }
