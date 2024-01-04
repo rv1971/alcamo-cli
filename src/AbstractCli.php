@@ -52,7 +52,7 @@ abstract class AbstractCli extends GetOpt
         }
 
         try {
-            return $this->innerRun($arguments);
+            return $this->innerRun();
         } catch (\Throwable $e) {
             if ($this->getVerbosity() > 0) {
                 echo (new Dumper())->dump($e) . "\n";
