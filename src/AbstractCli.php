@@ -14,10 +14,11 @@ use alcamo\exception\Dumper;
  */
 abstract class AbstractCli extends GetOpt
 {
-    /// Number of `verbose` options minus number of `quiet` options
-    public function getVerbosity(): int
+    private $progressReporter_; ///< ProgressReporter
+
+    public function getProgressReporter(): ProgressReporter
     {
-        return $this->getOption('verbose') - $this->getOption('quiet');
+        return $this->progressReporter_;
     }
 
     /**
@@ -51,10 +52,14 @@ abstract class AbstractCli extends GetOpt
             return 0;
         }
 
+        $this->progressReporter_ = new ProgressReporter(
+            $this->getOption('verbose') - $this->getOption('quiet')
+        );
+
         try {
             return $this->innerRun();
         } catch (\Throwable $e) {
-            if ($this->getVerbosity() > 0) {
+            if ($this->progressReporter_->getVerbosity() > 0) {
                 echo (new Dumper())->dump($e) . "\n";
             } else {
                 echo $e->getMessage() . "\n\n";
@@ -89,13 +94,6 @@ abstract class AbstractCli extends GetOpt
         string $text,
         ?int $minimumVerbosity = null
     ): bool {
-        if ($this->getVerbosity() >= (int)$minimumVerbosity) {
-            /* fwrite(STDERR, ...) may not work in php installations that are
-             * not meant for command-line usage, e.g. on hosted webspace */
-            file_put_contents('php://stderr', "$text\n");
-            return true;
-        }
-
-        return false;
+        return $this->progressReporter_->write($text, $minimumVerbosity);
     }
 }

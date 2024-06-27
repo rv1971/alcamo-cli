@@ -68,6 +68,8 @@ EOT
     {
         $cli = new MyCli();
 
+        $cli->run('');
+
         /* There is no simply way to test stderr output, so what is tested here
          * is just the verbosity level check. */
         $this->assertFalse($cli->reportProgress('VERBOSITY 1', 1));
