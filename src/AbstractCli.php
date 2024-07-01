@@ -52,7 +52,7 @@ abstract class AbstractCli extends GetOpt
             return 0;
         }
 
-        $this->progressReporter_ = new ProgressReporter(
+        $this->progressReporter_ = $this->createProgressReporter(
             $this->getOption('verbose') - $this->getOption('quiet')
         );
 
@@ -95,5 +95,11 @@ abstract class AbstractCli extends GetOpt
         ?int $minimumVerbosity = null
     ): bool {
         return $this->progressReporter_->write($text, $minimumVerbosity);
+    }
+
+    protected function createProgressReporter(
+        ?int $verbosity = null
+    ): ProgressReporter {
+        return new ProgressReporter($verbosity);
     }
 }
