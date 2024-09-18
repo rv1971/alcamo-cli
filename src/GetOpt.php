@@ -10,7 +10,7 @@
 
 namespace alcamo\cli;
 
-use GetOpt\{Command, GetOpt as GetOptBase, Operand, Option};
+use GetOpt\{Command, GetOpt as GetOptBase, Help, Operand, Option};
 
 /**
  * @brief GetOpt extension coding the whole structure in class constants
@@ -19,6 +19,9 @@ use GetOpt\{Command, GetOpt as GetOptBase, Operand, Option};
  */
 class GetOpt extends GetOptBase
 {
+    /// Description to be displayed as help text
+    public const DESCRIPTION = null;
+
     /// Input for createOptionsFromIterable()
     public const OPTIONS = [
         'help' =>    [ 'h', self::NO_ARGUMENT, 'Show help.' ],
@@ -44,7 +47,8 @@ class GetOpt extends GetOptBase
         $this
             ->addOptions($this->createOptionsFromIterable(static::OPTIONS))
             ->addOperands($this->createOperandsFromIterable(static::OPERANDS))
-            ->addCommands($this->createCommandsFromIterable(static::COMMANDS));
+            ->addCommands($this->createCommandsFromIterable(static::COMMANDS))
+            ->setHelp(new Help([ 'description' => static::DESCRIPTION ]));
     }
 
     /**
