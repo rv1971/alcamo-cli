@@ -5,7 +5,6 @@
 <?php
 
 use alcamo\cli\AbstractCli;
-use GetOpt\GetOpt;
 
 include $_composer_autoload_path ?? __DIR__ . '/../vendor/autoload.php';
 
@@ -62,10 +61,11 @@ Adding verbosity with `example --foo 42 -v` leads to something like
 Reducing verbosity with `example --foo 42 -q` creates no output.
 
 This illustrates the basic ideas:
-* Options, operands, commands etc. are defined by class constants in
-  derived classes. See GetOpt.php for details. The options `--help`,
-  `--quiet` and `--verbose` are predefined.
-* AbstractCli::run() processes the options, displays the help text if
+* Options, operands, commands etc. are defined by class constants in a
+  class derived from AbstractCli. See GetOpt.php for details. The
+  options `--help`, `--quiet` and `--verbose` are predefined.
+* `AbstractCli::run()` processes the options, displays the help text if
   requested, provides a logger with a log level depending on the
-  verbosity, and executes innerRun().
-* You implement innerRun() to do the actual work.
+  verbosity, and executes `innerRun()`.
+* You implement `innerRun()` to do the actual work. The return value of
+  `innerRun()` becopme the program's exit code.
