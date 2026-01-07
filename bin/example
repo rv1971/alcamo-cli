@@ -1,0 +1,30 @@
+#!/usr/bin/env php
+<?php
+
+use alcamo\cli\AbstractCli;
+use GetOpt\GetOpt;
+
+include $_composer_autoload_path ?? __DIR__ . '/../vendor/autoload.php';
+
+class ExampleCli extends AbstractCli
+{
+    public const OPTIONS =
+        [
+            'foo' => [ 'f', self::REQUIRED_ARGUMENT, 'Set foo.']
+        ]
+        + parent::OPTIONS;
+
+    public function innerRun(): int
+    {
+        if ($this->getOption('foo')) {
+            $this->getLogger()
+                ->notice('Foo was set to ' . $this->getOption('foo'));
+        }
+
+        $this->getLogger()->info('Info message.');
+
+        return 0;
+    }
+}
+
+exit((new ExampleCli([]))->run());

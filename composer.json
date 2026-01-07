@@ -6,6 +6,7 @@
     "require": {
         "php": "7.3 - 8.0",
         "alcamo/exception": "^0.1",
+        "monolog/monolog": "^2",
         "ulrichsg/getopt-php": "^3.4"
     },
     "autoload": {

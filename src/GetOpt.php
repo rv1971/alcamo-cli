@@ -3,21 +3,19 @@
 /**
  * @namespace alcamo\cli
  *
- * @brief Simplify creation of command-line interfaces
- *
- * @todo Write unit tests
+ * @brief Base classes for creation of command-line interfaces
  */
 
 namespace alcamo\cli;
 
-use GetOpt\{Command, GetOpt as GetOptBase, Help, Operand, Option};
+use GetOpt\{Command, GetOpt as BaseGetOpt, Help, Operand, Option};
 
 /**
  * @brief GetOpt extension coding the whole structure in class constants
  *
  * @date Last reviewed 2021-07-19
  */
-class GetOpt extends GetOptBase
+class GetOpt extends BaseGetOpt
 {
     /// Description to be displayed as help text
     public const DESCRIPTION = null;
@@ -35,7 +33,7 @@ class GetOpt extends GetOptBase
     /// Input for createCommandsFromIterable()
     public const COMMANDS = [];
 
-    /// Defaults for the $setting given to __construct
+    /// Defaults for the $settings given to __construct
     public const SETTINGS = [
         self::SETTING_STRICT_OPERANDS => true
     ];
@@ -110,7 +108,7 @@ class GetOpt extends GetOptBase
      *
      * @param $optionData Map of command names to numerically-indexed
      * arrays consisting of
-     * - handler
+     * - name of handler method (method of the present oject)
      * - options as input to createOptionsFromIterable()
      * - operands as input to createOperandsFromIterable()
      * - description

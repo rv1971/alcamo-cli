@@ -10,18 +10,18 @@ class MyCli extends AbstractCli
     public const OPTIONS = [
         'foo' => [
             'F',
-            GetOpt::MULTIPLE_ARGUMENT,
+            self::MULTIPLE_ARGUMENT,
             'Lorem ipsum.',
             'foo'
         ],
         'bar' => [
             'r',
-            GetOpt::REQUIRED_ARGUMENT,
+            self::REQUIRED_ARGUMENT,
             'Dolor sit amet.'
         ],
         'baz' => [
             null,
-            GetOpt::NO_ARGUMENT,
+            self::NO_ARGUMENT,
             'Consetetur sadipscing.'
         ]
     ] + parent::OPTIONS;
@@ -38,6 +38,7 @@ class MyCli extends AbstractCli
     }
 }
 
+/* This also tests the Logger class. */
 class AbstractCliTest extends TestCase
 {
     public function testHelp(): void
@@ -64,15 +65,38 @@ EOT
         $this->assertSame(0, $exitCode);
     }
 
-    public function testReportProgress(): void
-    {
+    /**
+     * @dataProvider loggerProvider
+     */
+    public function testLogger(
+        $cmdLine,
+        $expectedVerbosity,
+        $expectedLevel
+    ): void {
         $cli = new MyCli();
 
-        $cli->run('');
+        $cli->run($cmdLine);
 
-        /* There is no simply way to test stderr output, so what is tested here
-         * is just the verbosity level check. */
-        $this->assertFalse($cli->reportProgress('VERBOSITY 1', 1));
+        $this->assertSame($expectedVerbosity, $cli->getVerbosity());
+
+        $this->assertSame(
+            $expectedLevel,
+            $cli->getLogger()->getHandlers()[0]->getLevel()
+        );
+    }
+
+    public function loggerProvider(): array
+    {
+        return [
+            [ '', 0, Logger::NOTICE ],
+            [ '-v', 1, Logger::INFO ],
+            [ '-q -v -v -v', 2, Logger::DEBUG ],
+            [ '-vvv', 3, Logger::DEBUG ],
+            [ '-v -q -q', -1, Logger::WARNING ],
+            [ '-qq', -2, Logger::ERROR ],
+            [ '-qqq', -3, Logger::CRITICAL ],
+            [ '-qqqq', -4, Logger::CRITICAL ]
+        ];
     }
 
     public function testRun(): void
@@ -82,14 +106,49 @@ EOT
         $this->assertSame(42, $cli->run(''));
     }
 
+    public function testProcessException(): void
+    {
+        $logfile = __DIR__ . DIRECTORY_SEPARATOR . 'AbstractCli.log';
+
+        $cli = new MyCli();
+
+        if (file_exists($logfile)) {
+            unlink($logfile);
+        }
+
+        $cli->setLogger(new Logger(0, $logfile));
+
+        $cli->run("--qux");
+
+        $this->assertStringContainsString(
+            "] C Option 'qux' is unknown",
+            file_get_contents($logfile)
+        );
+
+        unlink($logfile);
+    }
+
     public function testRunException(): void
     {
+        $logfile = __DIR__ . DIRECTORY_SEPARATOR . 'AbstractCli.log';
+
         $cli = new MyCli();
+
+        if (file_exists($logfile)) {
+            unlink($logfile);
+        }
+
+        $cli->setLogger(new Logger(0, $logfile));
 
         $feature = 'foo';
 
-        $this->expectOutputString("\"$feature\" not supported\n\n");
-
         $cli->run("--bar $feature");
+
+        $this->assertStringContainsString(
+            "] C \"$feature\" not supported",
+            file_get_contents($logfile)
+        );
+
+        unlink($logfile);
     }
 }

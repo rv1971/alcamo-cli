@@ -2,23 +2,56 @@
 
 namespace alcamo\cli;
 
-use GetOpt\ArgumentException;
 use alcamo\exception\Dumper;
+use GetOpt\ArgumentException;
+use Monolog\Logger as MonologLogger;
 
 /**
  * @brief Base class for command-line interfaces
- *
- * @todo Write unit tests
  *
  * @date Last reviewed 2021-07-19
  */
 abstract class AbstractCli extends GetOpt
 {
-    private $progressReporter_; ///< ProgressReporter
+    private $verbosity_; ///< int
+    private $logger_; ///< Logger
 
-    public function getProgressReporter(): ProgressReporter
+    /// Count of `--verbose` minus count of `--quiet`
+    public function getVerbosity(): int
     {
-        return $this->progressReporter_;
+        return $this->verbosity_;
+    }
+
+    public function getLogger(): MonologLogger
+    {
+        return $this->logger_;
+    }
+
+    /**
+     * This is needed only for loggers with custom settings.
+     */
+    public function setLogger(MonologLogger $logger): void
+    {
+        $this->logger_ = $logger;
+    }
+
+    /**
+     * @brief Processess command line, compute verbosity, create logger
+     *
+     * The log level of the logger is set based on the verbosity (see
+     * getVerbosity()).
+     */
+    public function process($arguments = null)
+    {
+        parent::process($arguments);
+
+        $this->verbosity_ =
+            $this->getOption('verbose') - $this->getOption('quiet');
+
+        /* Create e default logger unless it has already been set. */
+        if (!isset($this->logger_)) {
+            $this->setLogger(new Logger($this->verbosity_));
+        }
     }
 
     /**
@@ -28,7 +61,7 @@ abstract class AbstractCli extends GetOpt
      *
      * Otherwise call innerRun(). If innerRun() throws an exception, it will
      * be displayed in short or long form depending whether the `--verbose`
-     * option was given. The exception code will be returned
+     * option was given. The exception code will be returned.
      *
      * @return exit code
      */
@@ -41,7 +74,11 @@ abstract class AbstractCli extends GetOpt
                 $this->showHelp();
             } else {
                 /** If an exception occurs, show the exception message. */
-                echo $e->getMessage();
+                if (!isset($this->logger_)) {
+                    $this->setLogger(new Logger(0));
+                }
+
+                $this->logger_->critical($e->getMessage());
             }
 
             return 255;
@@ -52,17 +89,13 @@ abstract class AbstractCli extends GetOpt
             return 0;
         }
 
-        $this->progressReporter_ = $this->createProgressReporter(
-            $this->getOption('verbose') - $this->getOption('quiet')
-        );
-
         try {
             return $this->innerRun();
         } catch (\Throwable $e) {
-            if ($this->progressReporter_->getVerbosity() > 0) {
-                echo (new Dumper())->dump($e) . "\n";
+            if ($this->verbosity_ > 0) {
+                $this->logger_->critical((new Dumper())->dump($e));
             } else {
-                echo $e->getMessage() . "\n\n";
+                $this->logger_->critical($e->getMessage());
             }
 
             return $e->getCode() != 0 ? $e->getCode() : 255;
@@ -84,22 +117,4 @@ abstract class AbstractCli extends GetOpt
      * @return exit code
      */
     abstract public function innerRun(): int;
-
-    /**
-     * @brief Output test to stderr if requested by verbosity level
-     *
-     * @return Whether text was output or not.
-     */
-    public function reportProgress(
-        string $text,
-        ?int $minimumVerbosity = null
-    ): bool {
-        return $this->progressReporter_->write($text, $minimumVerbosity);
-    }
-
-    protected function createProgressReporter(
-        ?int $verbosity = null
-    ): ProgressReporter {
-        return new ProgressReporter($verbosity);
-    }
 }
