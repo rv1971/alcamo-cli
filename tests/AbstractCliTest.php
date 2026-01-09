@@ -3,6 +3,7 @@
 namespace alcamo\cli;
 
 use alcamo\exception\Unsupported;
+use GetOpt\Operand;
 use PHPUnit\Framework\TestCase;
 
 class MyCli extends AbstractCli
@@ -38,6 +39,29 @@ class MyCli extends AbstractCli
     }
 }
 
+class MySubCommandCli extends AbstractCli
+{
+    public const COMMANDS = [
+        'qux' => [
+            'doQux',
+            [],
+            [ 'exitCode' => Operand::REQUIRED ],
+            'Perform qux.'
+        ],
+        'corge' => [ 'doCorge', [], [], 'Perform corge.' ],
+    ];
+
+    public function doQux(): int
+    {
+        return (int)$this->getOperand('exitCode');
+    }
+
+    public function doCorge(): int
+    {
+        return 49;
+    }
+}
+
 /* This also tests the Logger class. */
 class AbstractCliTest extends TestCase
 {
@@ -63,6 +87,21 @@ EOT
         $exitCode = $cli->run('--help');
 
         $this->assertSame(0, $exitCode);
+    }
+
+    public function testSubCommands(): void
+    {
+        $cli = new MySubCommandCli();
+
+        $exitCode = $cli->run('qux 43');
+
+        $this->assertSame(43, $exitCode);
+
+        $cli = new MySubCommandCli();
+
+        $exitCode = $cli->run('corge');
+
+        $this->assertSame(49, $exitCode);
     }
 
     /**
@@ -100,6 +139,13 @@ EOT
     }
 
     public function testRun(): void
+    {
+        $cli = new MyCli();
+
+        $this->assertSame(42, $cli->run(''));
+    }
+
+    public function testRunSubcommands(): void
     {
         $cli = new MyCli();
 

@@ -57,11 +57,20 @@ abstract class AbstractCli extends GetOpt
     /**
      * @brief Run the program
      *
-     * Call showHelp() if the `--help` option was given.
+     * Call showHelp() if
+     * - the `--help` option was given
+     * - or there are sub-commands defined in alcamo::cli::GetOpt::COMMANDS,
+     *   but no command was given on the command line.
      *
      * Otherwise call innerRun(). If innerRun() throws an exception, it will
      * be displayed in short or long form depending whether the `--verbose`
-     * option was given. The exception code will be returned.
+     * option was given. In this case, return exit code 255.
+     *
+     * If there are sub-commands defined:
+     * - If innerRun() returns a nonzero exit code, terminate with that code.
+     * - Otherwise call the handler for the given sub-command.
+     * Hence, in CLIs with sub-commands, innerRun() is used to execute any
+     * common code needed by all sub-commands.
      *
      * @return exit code
      */
@@ -89,8 +98,23 @@ abstract class AbstractCli extends GetOpt
             return 0;
         }
 
+        if (static::COMMANDS && !$this->getCommand()) {
+            $this->showHelp();
+            return 0;
+        }
+
         try {
-            return $this->innerRun();
+            if (static::COMMANDS) {
+                $exitCode = $this->innerRun();
+
+                if ($exitCode) {
+                    return $exitCode;
+                } else {
+                    return $this->{$this->getCommand()->getHandler()}();
+                }
+            } else {
+                return $this->innerRun();
+            }
         } catch (\Throwable $e) {
             if ($this->verbosity_ > 0) {
                 $this->logger_->critical((new Dumper())->dump($e));
@@ -114,7 +138,14 @@ abstract class AbstractCli extends GetOpt
      * Called by run() after processing the command line. See run() for
      * details.
      *
+     * The present implementation simply returns 0 so that CLIs with
+     * sub-commands do not need to re-implement innerRun() if they do not have
+     * any common code to execute before the sub-command handler.
+     *
      * @return exit code
      */
-    abstract public function innerRun(): int;
+    public function innerRun(): int
+    {
+        return 0;
+    }
 }
