@@ -24,7 +24,7 @@ class Logger extends BaseLogger
     ];
 
     /// Default log message format
-    public const FORMAT = "[%datetime%] %extra.level_char% %message%\n";
+    public const FORMAT = "[%datetime%] %extra.level_char% %message%" . PHP_EOL;
 
     /// Default date format in log messages
     public const DATE_FORMAT = 'H:i:s';
@@ -87,5 +87,16 @@ class Logger extends BaseLogger
                 return $record;
             }
         );
+    }
+
+    /**
+     * @brief Directly write a line to STDOUT or STDERR
+     *
+     * Particularly useful to write an empty line wto separate blocks of
+     * logging data.
+     */
+    public function writeLine(?string $text = null): void
+    {
+        fwrite($this->getHandlers()[0]->getStream(), $text . PHP_EOL);
     }
 }
