@@ -13,8 +13,8 @@ use Monolog\Logger as MonologLogger;
  */
 abstract class AbstractCli extends GetOpt
 {
-    private $verbosity_; ///< int
-    private $logger_; ///< Logger
+    private $verbosity_ = 0; ///< int
+    private $logger_;        ///< Logger
 
     /// Count of `--verbose` minus count of `--quiet`
     public function getVerbosity(): int
@@ -48,9 +48,8 @@ abstract class AbstractCli extends GetOpt
         $this->verbosity_ =
             $this->getOption('verbose') - $this->getOption('quiet');
 
-        /* Create e default logger unless it has already been set. */
         if (!isset($this->logger_)) {
-            $this->setLogger(new Logger($this->verbosity_));
+            $this->setLogger($this->createLogger());
         }
     }
 
@@ -84,7 +83,7 @@ abstract class AbstractCli extends GetOpt
             } else {
                 /** If an exception occurs, show the exception message. */
                 if (!isset($this->logger_)) {
-                    $this->setLogger(new Logger(0));
+                    $this->setLogger($this->createLogger());
                 }
 
                 $this->logger_->critical($e->getMessage());
@@ -147,5 +146,10 @@ abstract class AbstractCli extends GetOpt
     public function innerRun(): int
     {
         return 0;
+    }
+
+    protected function createLogger(): MonologLogger
+    {
+        return new Logger($this->verbosity_);
     }
 }

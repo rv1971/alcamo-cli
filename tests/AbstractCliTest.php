@@ -154,47 +154,39 @@ EOT
 
     public function testProcessException(): void
     {
-        $logfile = __DIR__ . DIRECTORY_SEPARATOR . 'AbstractCli.log';
+        $stream = fopen('php://memory', 'w+');
 
         $cli = new MyCli();
 
-        if (file_exists($logfile)) {
-            unlink($logfile);
-        }
-
-        $cli->setLogger(new Logger(0, $logfile));
+        $cli->setLogger(new Logger(0, $stream));
 
         $cli->run("--qux");
 
+        fseek($stream, 0);
+
         $this->assertStringContainsString(
             "] C Option 'qux' is unknown",
-            file_get_contents($logfile)
+            fgets($stream)
         );
-
-        unlink($logfile);
     }
 
     public function testRunException(): void
     {
-        $logfile = __DIR__ . DIRECTORY_SEPARATOR . 'AbstractCli.log';
+        $stream = fopen('php://memory', 'w+');
 
         $cli = new MyCli();
 
-        if (file_exists($logfile)) {
-            unlink($logfile);
-        }
-
-        $cli->setLogger(new Logger(0, $logfile));
+        $cli->setLogger(new Logger(0, $stream));
 
         $feature = 'foo';
 
         $cli->run("--bar $feature");
 
+        fseek($stream, 0);
+
         $this->assertStringContainsString(
             "] C \"$feature\" not supported",
-            file_get_contents($logfile)
+            fgets($stream)
         );
-
-        unlink($logfile);
     }
 }
