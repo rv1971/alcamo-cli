@@ -78,6 +78,7 @@ Options:
   -q, --quiet      Be less verbose.
   -r, --bar <arg>  Dolor sit amet.
   -v, --verbose    Be more verbose.
+  -V, --version    Show version.
   --baz            Consetetur sadipscing.
 
 
@@ -85,6 +86,17 @@ EOT
         );
 
         $exitCode = $cli->run('--help');
+
+        $this->assertSame(0, $exitCode);
+    }
+
+    public function testVersion(): void
+    {
+        $cli = new MyCli();
+
+        $this->expectOutputRegex('/alcamo\/cli .*/');
+
+        $exitCode = $cli->run('--version');
 
         $this->assertSame(0, $exitCode);
     }

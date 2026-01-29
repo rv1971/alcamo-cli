@@ -24,7 +24,8 @@ class GetOpt extends BaseGetOpt
     public const OPTIONS = [
         'help' =>    [ 'h', self::NO_ARGUMENT, 'Show help.' ],
         'quiet' =>   [ 'q', self::NO_ARGUMENT, 'Be less verbose.' ],
-        'verbose' => [ 'v', self::NO_ARGUMENT, 'Be more verbose.' ]
+        'verbose' => [ 'v', self::NO_ARGUMENT, 'Be more verbose.' ],
+        'version' => [ 'V', self::NO_ARGUMENT, 'Show version.' ]
     ];
 
     /// Input for createOperandsFromIterable()

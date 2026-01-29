@@ -43,6 +43,7 @@ Options:
   -h, --help       Show help.
   -q, --quiet      Be less verbose.
   -v, --verbose    Be more verbose.
+  -V, --version    Show version.
 ~~~
 
 The invocation `example --foo 42` outputs something like
@@ -63,7 +64,7 @@ Reducing verbosity with `example --foo 42 -q` creates no output.
 This illustrates the basic ideas:
 * Options, operands, commands etc. are defined by class constants in a
   class derived from AbstractCli. See GetOpt.php for details. The
-  options `--help`, `--quiet` and `--verbose` are predefined.
+  options `--help`, `--quiet`, `--verbose` and `--version` are predefined.
 * `AbstractCli::run()` processes the options, displays the help text if
   requested, provides a logger with a log level depending on the
   verbosity, and executes `innerRun()`.

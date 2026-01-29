@@ -3,6 +3,7 @@
 namespace alcamo\cli;
 
 use alcamo\exception\Dumper;
+use Composer\InstalledVersions;
 use GetOpt\ArgumentException;
 use Monolog\Logger as MonologLogger;
 
@@ -61,6 +62,8 @@ abstract class AbstractCli extends GetOpt
      * - or there are sub-commands defined in alcamo::cli::GetOpt::COMMANDS,
      *   but no command was given on the command line.
      *
+     * Call showVersion() if the `--version` option was given.
+     *
      * Otherwise call innerRun(). If innerRun() throws an exception, it will
      * be displayed in short or long form depending whether the `--verbose`
      * option was given. In this case, return exit code 255.
@@ -97,6 +100,11 @@ abstract class AbstractCli extends GetOpt
             return 0;
         }
 
+        if ($this->getOption('version')) {
+            $this->showVersion();
+            return 0;
+        }
+
         if (static::COMMANDS && !$this->getCommand()) {
             $this->showHelp();
             return 0;
@@ -129,6 +137,19 @@ abstract class AbstractCli extends GetOpt
     public function showHelp(): void
     {
         echo $this->getHelpText();
+    }
+
+    public function showVersion(): void
+    {
+        $rootPackage = InstalledVersions::getRootPackage();
+
+        $version = exec('git describe --tags');
+
+        if (!$version) {
+            $version = $rootPackage['version'];
+        }
+
+        echo "{$rootPackage['name']} $version" . PHP_EOL;
     }
 
     /**

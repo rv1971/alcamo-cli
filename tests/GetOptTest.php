@@ -71,7 +71,7 @@ class GetOptTest extends TestCase
 
         $options = $getOpt->getOptionObjects();
 
-        $this->assertSame(6, count($options));
+        $this->assertSame(7, count($options));
 
         $longNames = [];
         $shortNames = [];
@@ -84,12 +84,12 @@ class GetOptTest extends TestCase
         }
 
         $this->assertSame(
-            [ 'bar', 'foo', 'help', 'quiet', 'verbose', 'baz' ],
+            [ 'bar', 'foo', 'help', 'quiet', 'verbose', 'version', 'baz' ],
             $longNames
         );
 
         $this->assertSame(
-            [ 'b', 'f', 'h', 'q', 'v', null ],
+            [ 'b', 'f', 'h', 'q', 'v', 'V', null ],
             $shortNames
         );
 
@@ -100,6 +100,7 @@ class GetOptTest extends TestCase
                 'Show help.',
                 'Be less verbose.',
                 'Be more verbose.',
+                'Show version.',
                 'Perform baz.'
             ],
             $descriptions
