@@ -14,26 +14,14 @@ use Monolog\Logger as MonologLogger;
  */
 abstract class AbstractCli extends GetOpt
 {
+    use LoggableTrait;
+
     private $verbosity_ = 0; ///< int
-    private $logger_;        ///< Logger
 
     /// Count of `--verbose` minus count of `--quiet`
     public function getVerbosity(): int
     {
         return $this->verbosity_;
-    }
-
-    public function getLogger(): MonologLogger
-    {
-        return $this->logger_;
-    }
-
-    /**
-     * This is needed only for loggers with custom settings.
-     */
-    public function setLogger(MonologLogger $logger): void
-    {
-        $this->logger_ = $logger;
     }
 
     /**
