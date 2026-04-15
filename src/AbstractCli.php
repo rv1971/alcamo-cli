@@ -112,7 +112,19 @@ abstract class AbstractCli extends GetOpt
             }
         } catch (\Throwable $e) {
             if ($this->verbosity_ > 0) {
-                $this->logger_->critical((new Dumper())->dump($e));
+                foreach (explode("\n", (new Dumper())->dump($e)) as $line) {
+                    if ($line) {
+                        $this->logger_->critical($line);
+                    }
+                }
+
+                if ($this->verbosity_ > 1) {
+                    foreach (explode("\n", $e->getTraceAsString()) as $line) {
+                        if ($line) {
+                            $this->logger_->critical($line);
+                        }
+                    }
+                }
             } else {
                 $this->logger_->critical($e->getMessage());
             }
