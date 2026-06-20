@@ -64,7 +64,14 @@ class Logger extends BaseLogger
         }
 
 
-        $handler = new StreamHandler($stream ?? STDERR, $logLevel);
+        $handler = new StreamHandler(
+            $stream ?? (
+                defined('STDERR')
+                    ? constant('STDERR')
+                    : fopen('php://stderr', 'w')
+            ),
+            $logLevel
+        );
 
         $handler->setFormatter(
             new LineFormatter(
